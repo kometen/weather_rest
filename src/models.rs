@@ -39,9 +39,9 @@ impl Into<DateTime<Local>> for MyDateTimeWrapper {
 }
 
 impl<DB, ST> Queryable<ST, DB> for MyDateTimeWrapper
-    where
-        DB: Backend,
-        DateTime<Utc>: Queryable<ST, DB>,
+where
+    DB: Backend,
+    DateTime<Utc>: Queryable<ST, DB>,
 {
     type Row = <DateTime<Utc> as Queryable<ST, DB>>::Row;
 
