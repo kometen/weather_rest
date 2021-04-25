@@ -72,7 +72,7 @@ fn db_get_readings_by_id(
     let conn = pool.get().unwrap();
     readings
         .order(measurement_time_default.desc())
-        .limit(256)
+        .limit(18)
         .filter(id.eq(reading_id))
         .load::<Reading>(&conn)
 }
