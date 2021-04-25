@@ -39,7 +39,7 @@ async fn main() -> std::io::Result<()> {
                 web::get().to(controller::get_readings_by_id),
             )
     })
-    .bind("127.0.0.1:8090")?
+    .bind("0.0.0.0:8090")?
     .run()
     .await
 }
