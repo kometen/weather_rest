@@ -28,6 +28,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(web::PayloadConfig::new(1 << 25))
             .data(pool.clone())
+            .route("/", web::get().to(controller::get_root))
             .route("/locations", web::get().to(controller::get_locations))
             .route(
                 "/locations/{id}",

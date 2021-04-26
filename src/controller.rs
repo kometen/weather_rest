@@ -4,9 +4,13 @@ use crate::schema::latest_readings::dsl::latest_readings;
 use crate::schema::locations::dsl::locations;
 use crate::schema::readings::columns::{id, measurement_time_default};
 use crate::schema::readings::dsl::readings;
-use actix_web::{web, Error, HttpResponse};
+use actix_web::{web, Error, HttpResponse, Responder};
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 use std::vec::Vec;
+
+pub async fn get_root() -> impl Responder {
+    HttpResponse::Ok().body("Weather stats from Statens Vegvesen, The Norwegian Public Roads Administration! Updated approximately every ten minutes. Paths: /locations/{id}, /readings/{id}.")
+}
 
 pub async fn get_locations(db: web::Data<Pool>) -> Result<HttpResponse, Error> {
     Ok(web::block(move || db_get_locations(db))
