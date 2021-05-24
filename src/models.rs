@@ -30,6 +30,17 @@ pub struct Location {
     pub longitude: BigDecimal,
 }
 
+#[derive(Serialize, Queryable)]
+pub struct LocationReading {
+    #[diesel(deserialize_as = "MyDateTimeWrapper")]
+    pub measurement_time_default: DateTime<Local>,
+    pub id: i32,
+    pub name: String,
+    pub latitude: BigDecimal,
+    pub longitude: BigDecimal,
+    pub data: serde_json::Value,
+}
+
 pub struct MyDateTimeWrapper(DateTime<Local>);
 
 impl Into<DateTime<Local>> for MyDateTimeWrapper {

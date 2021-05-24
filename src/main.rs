@@ -39,6 +39,10 @@ async fn main() -> std::io::Result<()> {
                 "/readings/{id}",
                 web::get().to(controller::get_readings_by_id),
             )
+            .route(
+                "/location_readings",
+                web::get().to(controller::get_location_readings),
+            )
     })
     .bind("0.0.0.0:8090")?
     .run()

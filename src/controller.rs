@@ -1,6 +1,7 @@
 use super::Pool;
-use crate::models::{LatestReading, Location, Reading};
+use crate::models::{LatestReading, Location, LocationReading, Reading};
 use crate::schema::latest_readings::dsl::latest_readings;
+use crate::schema::location_readings::dsl::location_readings;
 use crate::schema::locations::dsl::locations;
 use crate::schema::readings::columns::{id, measurement_time_default};
 use crate::schema::readings::dsl::readings;
@@ -79,4 +80,18 @@ fn db_get_readings_by_id(
         .limit(18)
         .filter(id.eq(reading_id))
         .load::<Reading>(&conn)
+}
+
+pub async fn get_location_readings(db: web::Data<Pool>) -> Result<HttpResponse, Error> {
+    Ok(web::block(move || db_get_location_readings(db))
+        .await
+        .map(|reading| HttpResponse::Ok().json(reading))
+        .map_err(|_| HttpResponse::InternalServerError())?)
+}
+
+fn db_get_location_readings(
+    pool: web::Data<Pool>,
+) -> Result<Vec<LocationReading>, diesel::result::Error> {
+    let conn = pool.get().unwrap();
+    location_readings.load::<LocationReading>(&conn)
 }

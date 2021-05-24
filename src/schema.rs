@@ -23,3 +23,14 @@ table! {
         longitude -> Numeric,
     }
 }
+
+table! {
+    location_readings {
+        measurement_time_default -> Timestamptz,
+        id -> Integer,
+        name -> Text,
+        latitude -> Numeric,
+        longitude -> Numeric,
+        data -> Jsonb,
+    }
+}
