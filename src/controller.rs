@@ -103,7 +103,6 @@ pub async fn get_location_readings(db: web::Data<Pool>) -> Result<HttpResponse, 
                     data: s.clone(),
                 };
                 vec.push(out);
-                println!("{}", &s);
             }
             HttpResponse::Ok().json(vec)
         })
