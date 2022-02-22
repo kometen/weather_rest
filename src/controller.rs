@@ -1,5 +1,5 @@
 use super::Pool;
-use crate::models::{LatestReading, Location, LocationReading, Reading};
+use crate::models::{LatestReading, Location, LocationReading, Reading, Measurement, LocationReadingOut};
 use crate::schema::latest_readings::dsl::latest_readings;
 use crate::schema::location_readings::dsl::location_readings;
 use crate::schema::locations::dsl::locations;
@@ -85,7 +85,28 @@ fn db_get_readings_by_id(
 pub async fn get_location_readings(db: web::Data<Pool>) -> Result<HttpResponse, Error> {
     Ok(web::block(move || db_get_location_readings(db))
         .await
-        .map(|reading| HttpResponse::Ok().json(reading))
+        .map(|reading| {
+            let mut vec: Vec<LocationReadingOut> = Vec::new();
+            for v in &reading {
+                let d: Vec<Measurement> = serde_json::from_str(&v.data.to_string()).unwrap();
+                let mut s = String::new();
+                for e in &d {
+                    let m = [&e.field_description, ":", &e.measurement.to_string(), ","].concat();
+                    s.push_str(&m);
+                }
+                let out = LocationReadingOut {
+                    measurement_time_default: v.measurement_time_default,
+                    id: v.id.clone(),
+                    name: v.name.clone(),
+                    latitude: v.latitude.clone(),
+                    longitude: v.longitude.clone(),
+                    data: s.clone(),
+                };
+                vec.push(out);
+                println!("{}", &s);
+            }
+            HttpResponse::Ok().json(vec)
+        })
         .map_err(|_| HttpResponse::InternalServerError())?)
 }
 

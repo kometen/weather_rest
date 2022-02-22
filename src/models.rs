@@ -2,7 +2,7 @@ use bigdecimal::BigDecimal;
 use chrono::{DateTime, Local, Utc};
 use diesel::backend::Backend;
 use diesel::deserialize::Queryable;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Queryable)]
 pub struct Reading {
@@ -39,6 +39,23 @@ pub struct LocationReading {
     pub latitude: BigDecimal,
     pub longitude: BigDecimal,
     pub data: serde_json::Value,
+}
+
+#[derive(Serialize)]
+pub struct LocationReadingOut {
+    pub measurement_time_default: DateTime<Local>,
+    pub id: i32,
+    pub name: String,
+    pub latitude: BigDecimal,
+    pub longitude: BigDecimal,
+    pub data: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Measurement {
+    pub field_description: String,
+    pub index:i16,
+    pub measurement: BigDecimal,
 }
 
 pub struct MyDateTimeWrapper(DateTime<Local>);
