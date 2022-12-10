@@ -3,6 +3,7 @@ use chrono::{DateTime, Local, Utc};
 use diesel::backend::Backend;
 use diesel::deserialize::Queryable;
 use serde::{Serialize, Deserialize};
+use crate::schema::measurements_single_location_function;
 
 #[derive(Serialize, Queryable)]
 pub struct Reading {
@@ -49,6 +50,18 @@ pub struct LocationReadingOut {
     pub latitude: BigDecimal,
     pub longitude: BigDecimal,
     pub data: String,
+}
+
+#[derive(Serialize, Queryable, QueryableByName)]
+#[table_name = "measurements_single_location_function"]
+pub struct MeasurementsSingleLocation {
+    pub id: i32,
+    pub name: String,
+    pub latitude: BigDecimal,
+    pub longitude: BigDecimal,
+    #[diesel(deserialize_as = "MyDateTimeWrapper")]
+    pub measurement_time_default: DateTime<Local>,
+    pub measurements: serde_json::Value,
 }
 
 #[derive(Debug, Deserialize)]

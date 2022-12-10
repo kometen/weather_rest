@@ -43,6 +43,10 @@ async fn main() -> std::io::Result<()> {
                 "/location_readings",
                 web::get().to(controller::get_location_readings),
             )
+            .route(
+                "/measurements_single_location/{id}/{rows}",
+                web::get().to(controller::get_measurements_single_location),
+            )
     })
     .bind("0.0.0.0:8090")?
     .run()

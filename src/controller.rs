@@ -1,12 +1,12 @@
 use super::Pool;
-use crate::models::{LatestReading, Location, LocationReading, Reading, Measurement, LocationReadingOut};
+use crate::models::{LatestReading, Location, LocationReading, Reading, Measurement, LocationReadingOut, MeasurementsSingleLocation};
 use crate::schema::latest_readings::dsl::latest_readings;
 use crate::schema::location_readings::dsl::location_readings;
 use crate::schema::locations::dsl::locations;
 use crate::schema::readings::columns::{id, measurement_time_default};
 use crate::schema::readings::dsl::readings;
 use actix_web::{web, Error, HttpResponse, Responder};
-use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, QueryResult, RunQueryDsl};
 use std::vec::Vec;
 
 pub async fn get_root() -> impl Responder {
@@ -114,4 +114,30 @@ fn db_get_location_readings(
 ) -> Result<Vec<LocationReading>, diesel::result::Error> {
     let conn = pool.get().unwrap();
     location_readings.load::<LocationReading>(&conn)
+}
+
+pub async fn get_measurements_single_location(
+    db: web::Data<Pool>,
+    params: web::Path<(i32, i32)>,
+) -> Result<HttpResponse, Error> {
+    let (location_id, rows) = params.into_inner();
+    Ok(
+        web::block(move || db_get_measurements_single_location(db, location_id, rows))
+            .await
+            .map(|location| HttpResponse::Ok().json(location))
+            .map_err(|_| HttpResponse::InternalServerError())?,
+    )
+}
+
+fn db_get_measurements_single_location(
+    pool: web::Data<Pool>,
+    location_id: i32,
+    rows: i32,
+) -> QueryResult<Vec<MeasurementsSingleLocation>> {
+    println!("get_measurements_single_location(), id: {}, rows: {}", location_id, rows);
+    let conn = pool.get().unwrap();
+    let result=
+        diesel::sql_query("select * from measurements_single_location_function(1,10)")
+            .get_result(&conn);
+    return result;
 }

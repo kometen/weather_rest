@@ -34,3 +34,14 @@ table! {
         data -> Jsonb,
     }
 }
+
+table! {
+    measurements_single_location_function {
+        id -> Integer,
+        name -> Text,
+        latitude -> Numeric,
+        longitude -> Numeric,
+        measurement_time_default -> Timestamptz,
+        measurements -> Jsonb,
+    }
+}
