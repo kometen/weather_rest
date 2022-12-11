@@ -4,7 +4,7 @@ use actix_web::{get, post, web, HttpResponse};
 use crate::schema::measurements_single_location_function::measurements;
 
 #[get("/measurements_single_location/{id}/{rows}")]
-async fn measurements_single_location(path: web::Path<(u32, u32)>) -> Result<HttpResponse, CustomError> {
+async fn measurements_single_location(path: web::Path<(i32, i32)>) -> Result<HttpResponse, CustomError> {
     let (id, rows) = path.into_inner();
     let m = MeasurementsSingleLocation::measurements_single_location(id, rows)?;
     Ok(HttpResponse::Ok().json(m))

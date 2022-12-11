@@ -3,6 +3,7 @@ use chrono::{DateTime, Local, NaiveDateTime, Utc};
 use diesel::backend::Backend;
 use diesel::deserialize::Queryable;
 use diesel::RunQueryDsl;
+use diesel::sql_types::Integer;
 use serde::{Serialize, Deserialize};
 use crate::db;
 use crate::error_handler::CustomError;
@@ -100,10 +101,12 @@ where
 
 
 impl MeasurementsSingleLocation {
-    pub fn measurements_single_location(id: u32, rows: u32) -> Result<Vec<MeasurementsSingleLocation>, CustomError> {
-        let q = "select * from measurements_single_location_function(1,10)";
+    pub fn measurements_single_location(id: i32, rows: i32) -> Result<Vec<MeasurementsSingleLocation>, CustomError> {
+        let q = "select * from measurements_single_location_function($1,$2)";
         let mut conn = db::connection()?;
         let m= diesel::sql_query(q)
+            .bind::<Integer, _>(id)
+            .bind::<Integer, _>(rows)
             .get_results(&mut conn)?;
         Ok(m)
     }
