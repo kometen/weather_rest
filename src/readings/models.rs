@@ -1,10 +1,14 @@
 use bigdecimal::BigDecimal;
-use chrono::{DateTime, Local, Utc};
+use chrono::{DateTime, Local, NaiveDateTime, Utc};
 use diesel::backend::Backend;
 use diesel::deserialize::Queryable;
+use diesel::RunQueryDsl;
 use serde::{Serialize, Deserialize};
+use crate::db;
+use crate::error_handler::CustomError;
 use crate::schema::measurements_single_location_function;
 
+/*
 #[derive(Serialize, Queryable)]
 pub struct Reading {
     #[diesel(deserialize_as = "MyDateTimeWrapper")]
@@ -51,6 +55,7 @@ pub struct LocationReadingOut {
     pub longitude: BigDecimal,
     pub data: String,
 }
+*/
 
 #[derive(Serialize, Queryable, QueryableByName)]
 #[table_name = "measurements_single_location_function"]
@@ -59,11 +64,12 @@ pub struct MeasurementsSingleLocation {
     pub name: String,
     pub latitude: BigDecimal,
     pub longitude: BigDecimal,
-    #[diesel(deserialize_as = "MyDateTimeWrapper")]
-    pub measurement_time_default: DateTime<Local>,
+    //#[diesel(deserialize_as = "MyDateTimeWrapper")]
+    pub measurement_time_default: NaiveDateTime,
     pub measurements: serde_json::Value,
 }
 
+/*
 #[derive(Debug, Deserialize)]
 pub struct Measurement {
     pub field_description: String,
@@ -88,5 +94,17 @@ where
 
     fn build(row: Self::Row) -> Self {
         Self(<DateTime<Utc> as Queryable<ST, DB>>::build(row).with_timezone(&Local))
+    }
+}
+*/
+
+
+impl MeasurementsSingleLocation {
+    pub fn measurements_single_location(id: u32, rows: u32) -> Result<Vec<MeasurementsSingleLocation>, CustomError> {
+        let q = "select * from measurements_single_location_function(1,10)";
+        let mut conn = db::connection()?;
+        let m= diesel::sql_query(q)
+            .get_results(&mut conn)?;
+        Ok(m)
     }
 }

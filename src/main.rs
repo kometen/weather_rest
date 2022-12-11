@@ -3,13 +3,17 @@
 extern crate diesel;
 
 mod controller;
-//mod errors;
-mod models;
 mod schema;
+mod db;
+mod error_handler;
+mod readings;
 
-use actix_web::{web, App, HttpServer};
+use std::env;
+use actix_web::{App, HttpServer, web};
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
+use listenfd::ListenFd;
+use crate::schema::measurements_single_location_function::measurements;
 
 pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
@@ -17,13 +21,23 @@ pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     std::env::set_var("RUST_LOG", "actix_web=debug");
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not set");
+    db::init();
 
-    let manager = ConnectionManager::<PgConnection>::new(database_url);
-    let pool = r2d2::Pool::builder()
-        .build(manager)
-        .expect("Failed to create pool.");
+    let mut listenfd = ListenFd::from_env();
+    let mut server = HttpServer::new(|| App::new().configure(readings::init_routes));
 
+    server = match listenfd.take_tcp_listener(0)? {
+        Some(listener) => server.listen(listener)?,
+        None => {
+            let host = env::var("HOST").expect("Please configure host in .env");
+            let port = env::var("PORT").expect("Please configure port in .env");
+            server.bind(format!("{}:{}", host, port))?
+        }
+    };
+
+    server.run().await
+
+    /*
     HttpServer::new(move || {
         App::new()
             .data(web::PayloadConfig::new(1 << 25))
@@ -50,5 +64,5 @@ async fn main() -> std::io::Result<()> {
     })
     .bind("0.0.0.0:8090")?
     .run()
-    .await
+    .await*/
 }

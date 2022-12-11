@@ -1,5 +1,6 @@
+/*
 use super::Pool;
-use crate::models::{LatestReading, Location, LocationReading, Reading, Measurement, LocationReadingOut, MeasurementsSingleLocation};
+use crate::readings::models::{LatestReading, Location, LocationReading, Reading, Measurement, LocationReadingOut, MeasurementsSingleLocation};
 use crate::schema::latest_readings::dsl::latest_readings;
 use crate::schema::location_readings::dsl::location_readings;
 use crate::schema::locations::dsl::locations;
@@ -12,6 +13,7 @@ use std::vec::Vec;
 pub async fn get_root() -> impl Responder {
     HttpResponse::Ok().body("Weather stats from Statens Vegvesen, The Norwegian Public Roads Administration! Updated approximately every ten minutes. Paths: /locations/{id}, /readings/{id}.")
 }
+
 
 pub async fn get_locations(db: web::Data<Pool>) -> Result<HttpResponse, Error> {
     Ok(web::block(move || db_get_locations(db))
@@ -141,3 +143,4 @@ fn db_get_measurements_single_location(
             .get_result(&conn);
     return result;
 }
+*/
