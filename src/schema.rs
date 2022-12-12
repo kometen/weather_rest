@@ -39,8 +39,8 @@ table! {
     measurements_single_location_function {
         id -> Integer,
         name -> Text,
-        latitude -> Numeric,
-        longitude -> Numeric,
+        latitude -> Text,
+        longitude -> Text,
         measurement_time_default -> Timestamptz,
         measurements -> Jsonb,
     }
